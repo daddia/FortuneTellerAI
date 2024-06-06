@@ -94,4 +94,4 @@ dmypy.json
 .vscode/
 
 # Project-specific
-powerball_numbers.csv
+*.csv
