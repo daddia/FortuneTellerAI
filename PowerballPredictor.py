@@ -25,6 +25,10 @@ data['sum_numbers_1'] = data[number_columns_1].sum(axis=1)
 data['odd_count_1'] = data[number_columns_1].apply(lambda row: sum(num % 2 != 0 for num in row), axis=1)
 data['even_count_1'] = data[number_columns_1].apply(lambda row: sum(num % 2 == 0 for num in row), axis=1)
 
+# Handle NaN or infinite values
+data.replace([np.inf, -np.inf], np.nan, inplace=True)
+data.dropna(inplace=True)
+
 # Data Preprocessing
 feature_columns = ['draw_number', 'sum_numbers_1', 'odd_count_1', 'even_count_1'] + [f'{col}_freq' for col in number_columns_1] + ['powerball_freq']
 X = data[feature_columns]
@@ -44,8 +48,8 @@ y_pred_1 = model_1.predict(X_test_1)
 y_pred_2 = model_2.predict(X_test_2)
 mse_1 = mean_squared_error(y_test_1, y_pred_1)
 mse_2 = mean_squared_error(y_test_2, y_pred_2)
-#print(f'Mean Squared Error for Barrel 1: {mse_1}')
-#print(f'Mean Squared Error for Powerball: {mse_2}')
+print(f'Mean Squared Error for Barrel 1: {mse_1}')
+print(f'Mean Squared Error for Powerball: {mse_2}')
 
 # Predicting the next set of numbers (for illustration purposes)
 next_draw_number = data['draw_number'].max() + 1
@@ -67,7 +71,9 @@ def get_unique_numbers(predictions, num_numbers, min_value, max_value):
     unique_numbers = np.clip(unique_numbers, min_value, max_value)
     unique_numbers = list(set(unique_numbers))  # Ensure uniqueness
     while len(unique_numbers) < num_numbers:
-        unique_numbers.append(np.random.randint(min_value, max_value + 1))
+        new_number = np.random.randint(min_value, max_value + 1)
+        if new_number not in unique_numbers:
+            unique_numbers.append(new_number)
     unique_numbers = unique_numbers[:num_numbers]
     return sorted(unique_numbers)
 
